@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  uptime-wolf-web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5176:80"
+    depends_on:
+      - uptime-wolf-api
+    restart: unless-stopped
+
+  uptime-wolf-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    ports:
+      - "3003:3003"
+    volumes:
+      - api-data:/app/data
+    environment:
+      - PORT=3003
+      - DB_PATH=/app/data/uptime-wolf.db
+      - SMTP_HOST=${SMTP_HOST:-}
+      - SMTP_PORT=${SMTP_PORT:-587}
+      - SMTP_SECURE=${SMTP_SECURE:-false}
+      - SMTP_USER=${SMTP_USER:-}
+      - SMTP_PASS=${SMTP_PASS:-}
+      - SMTP_FROM=${SMTP_FROM:-}
+    restart: unless-stopped
+
+volumes:
+  api-data:
